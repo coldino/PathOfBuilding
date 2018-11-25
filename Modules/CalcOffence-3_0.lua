@@ -1104,6 +1104,11 @@ function calcs.offence(env, actor, activeSkill)
 		output.AverageHit = (totalHitMin + totalHitMax) / 2 * (1 - output.CritChance / 100) + (totalCritMin + totalCritMax) / 2 * output.CritChance / 100
 		output.AverageDamage = output.AverageHit * output.HitChance / 100
 		output.TotalDPS = output.AverageDamage * (globalOutput.HitSpeed or globalOutput.Speed) * (skillData.dpsMultiplier or 1)
+
+		if skillFlags.sumAllProjectiles then
+			output.TotalDPS = output.TotalDPS * modDB:Sum("BASE", skillCfg, "ProjectileCount")
+		end
+
 		if breakdown then
 			if output.CritEffect ~= 1 then
 				breakdown.AverageHit = {
@@ -1174,6 +1179,9 @@ function calcs.offence(env, actor, activeSkill)
 				s_format("%.1f ^8(average hit)", output.AverageDamage),
 				output.HitSpeed and s_format("x %.2f ^8(hit rate)", output.HitSpeed) or s_format("x %.2f ^8(cast rate)", output.Speed),
 			}
+		end
+		if skillFlags.sumAllProjectiles then
+			t_insert(breakdown.TotalDPS, s_format("x %d ^8(projectiles)", output.ProjectileCount))
 		end
 		if skillData.dpsMultiplier then
 			t_insert(breakdown.TotalDPS, s_format("x %g ^8(DPS multiplier for this skill)", skillData.dpsMultiplier))

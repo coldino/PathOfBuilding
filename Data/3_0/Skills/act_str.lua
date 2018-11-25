@@ -4031,10 +4031,18 @@ skills["MoltenStrike"] = {
 			projectile = true,
 			area = true,
 		},
+		{
+			name = "Magma Balls (all)",
+			melee = false,
+			projectile = true,
+			area = true,
+			sumAllProjectiles = true,
+		},
 	},
 	statMap = {
 		["active_skill_damage_over_time_from_projectile_hits_+%_final"] = {
-			mod("Damage", "MORE", nil, ModFlag.Dot, 0, { type = "SkillPart", skillPart = 2 })
+			mod("Damage", "MORE", nil, ModFlag.Dot, 0, { type = "SkillPart", skillPart = 2 }),
+			mod("Damage", "MORE", nil, ModFlag.Dot, 0, { type = "SkillPart", skillPart = 3 })
 		},
 	},
 	baseFlags = {
