@@ -269,10 +269,10 @@ function calcs.offence(env, actor, activeSkill)
 	end
 	if skillFlags.melee then
 		if skillFlags.weapon1Attack then
-			actor.weaponRange1 = (actor.weaponData1.range and actor.weaponData1.range + skillModList:Sum("BASE", skillCfg, "MeleeWeaponRange")) or (env.data.weaponTypeInfo["None"].range + skillModList:Sum("BASE", skillCfg, "UnarmedRange"))	
+			actor.weaponRange1 = (actor.weaponData1.range and actor.weaponData1.range + skillModList:Sum("BASE", skillCfg, "MeleeWeaponRange")) or (env.data.weaponTypeInfo["None"].range + skillModList:Sum("BASE", skillCfg, "UnarmedRange"))
 		end
 		if skillFlags.weapon2Attack then
-			actor.weaponRange2 = (actor.weaponData2.range and actor.weaponData2.range + skillModList:Sum("BASE", skillCfg, "MeleeWeaponRange")) or (env.data.weaponTypeInfo["None"].range + skillModList:Sum("BASE", skillCfg, "UnarmedRange"))	
+			actor.weaponRange2 = (actor.weaponData2.range and actor.weaponData2.range + skillModList:Sum("BASE", skillCfg, "MeleeWeaponRange")) or (env.data.weaponTypeInfo["None"].range + skillModList:Sum("BASE", skillCfg, "UnarmedRange"))
 		end
 		if activeSkill.skillTypes[SkillType.MeleeSingleTarget] then
 			local range = 100
@@ -552,7 +552,7 @@ function calcs.offence(env, actor, activeSkill)
 			end
 			if inc ~= 0 then
 				t_insert(breakdown.ManaCost, s_format("x %.2f ^8(increased/reduced mana cost)", 1 + inc/100))
-			end	
+			end
 			if base ~= 0 then
 				t_insert(breakdown.ManaCost, s_format("- %d ^8(- mana cost)", -base))
 			end
@@ -657,7 +657,7 @@ function calcs.offence(env, actor, activeSkill)
 	for _, pass in ipairs(passList) do
 		local globalOutput, globalBreakdown = output, breakdown
 		local source, output, cfg, breakdown = pass.source, pass.output, pass.cfg, pass.breakdown
-		
+
 		-- Calculate hit chance
 		output.Accuracy = calcLib.val(skillModList, "Accuracy", cfg)
 		if breakdown then
@@ -712,7 +712,7 @@ function calcs.offence(env, actor, activeSkill)
 					base = s_format("%.2f ^8(base)", 1 / baseTime),
 					{ "%.2f ^8(increased/reduced)", 1 + inc/100 },
 					{ "%.2f ^8(more/less)", more },
-					{ "%.2f ^8(action speed modifier)", skillFlags.selfCast and globalOutput.ActionSpeedMod or 1 }, 
+					{ "%.2f ^8(action speed modifier)", skillFlags.selfCast and globalOutput.ActionSpeedMod or 1 },
 					total = s_format("= %.2f ^8per second", output.Speed)
 				})
 			end
@@ -940,7 +940,7 @@ function calcs.offence(env, actor, activeSkill)
 					if pass == 1 then
 						-- Apply crit multiplier
 						allMult = allMult * output.CritMultiplier
-					end				
+					end
 					min = min * allMult
 					max = max * allMult
 					if (min ~= 0 or max ~= 0) and env.mode_effective then
@@ -990,7 +990,7 @@ function calcs.offence(env, actor, activeSkill)
 							end
 						end
 					else
-						if not noLifeLeech then				
+						if not noLifeLeech then
 							local lifeLeech
 							if skillModList:Flag(nil, "LifeLeechBasedOnChaosDamage") then
 								if damageType == "Chaos" then
@@ -1106,7 +1106,7 @@ function calcs.offence(env, actor, activeSkill)
 		output.TotalDPS = output.AverageDamage * (globalOutput.HitSpeed or globalOutput.Speed) * (skillData.dpsMultiplier or 1)
 
 		if skillFlags.sumAllProjectiles then
-			output.TotalDPS = output.TotalDPS * modDB:Sum("BASE", skillCfg, "ProjectileCount")
+			output.TotalDPS = output.TotalDPS * skillModList:Sum("BASE", skillCfg, "ProjectileCount")
 		end
 
 		if breakdown then
@@ -1247,7 +1247,7 @@ function calcs.offence(env, actor, activeSkill)
 		local dotTypeCfg = copyTable(dotCfg, true)
 		dotTypeCfg.keywordFlags = bor(dotTypeCfg.keywordFlags, KeywordFlag[damageType.."Dot"])
 		activeSkill["dot"..damageType.."Cfg"] = dotTypeCfg
-		local baseVal 
+		local baseVal
 		if canDeal[damageType] then
 			baseVal = skillData[damageType.."Dot"] or 0
 		else
@@ -1387,7 +1387,7 @@ function calcs.offence(env, actor, activeSkill)
 			output.FreezeChanceOnHit = output.FreezeChanceOnHit * freezeMult
 			output.FreezeChanceOnCrit = output.FreezeChanceOnCrit * freezeMult
 		end
-	
+
 		local function calcAilmentDamage(type, sourceHitDmg, sourceCritDmg)
 			-- Calculate the inflict chance and base damage of a secondary effect (bleed/poison/ignite/shock/freeze)
 			local chanceOnHit, chanceOnCrit = output[type.."ChanceOnHit"], output[type.."ChanceOnCrit"]
@@ -1516,7 +1516,7 @@ function calcs.offence(env, actor, activeSkill)
 					t_insert(breakdown.BleedDPS, s_format("= %.1f", baseVal))
 					breakdown.multiChain(breakdown.BleedDPS, {
 						label = "Bleed DPS:",
-						base = s_format("%.1f ^8(total damage per second)", baseVal), 
+						base = s_format("%.1f ^8(total damage per second)", baseVal),
 						{ "%.2f ^8(ailment effect modifier)", effectMod },
 						{ "%.3f ^8(effective DPS modifier)", effMult },
 						total = s_format("= %.1f ^8per second", output.BleedDPS),
@@ -1647,7 +1647,7 @@ function calcs.offence(env, actor, activeSkill)
 					t_insert(breakdown.PoisonDPS, s_format("= %.1f", baseVal, 1))
 					breakdown.multiChain(breakdown.PoisonDPS, {
 						label = "Poison DPS:",
-						base = s_format("%.1f ^8(total damage per second)", baseVal), 
+						base = s_format("%.1f ^8(total damage per second)", baseVal),
 						{ "%.2f ^8(ailment effect modifier)", effectMod },
 						{ "%.3f ^8(effective DPS modifier)", effMult },
 						total = s_format("= %.1f ^8per second", output.PoisonDPS),
@@ -1687,7 +1687,7 @@ function calcs.offence(env, actor, activeSkill)
 					end
 				end
 			end
-		end	
+		end
 
 		-- Calculate ignite chance and damage
 		if canDeal.Fire and (output.IgniteChanceOnHit + output.IgniteChanceOnCrit) > 0 then
@@ -1797,7 +1797,7 @@ function calcs.offence(env, actor, activeSkill)
 					t_insert(breakdown.IgniteDPS, s_format("= %.1f", baseVal, 1))
 					breakdown.multiChain(breakdown.IgniteDPS, {
 						label = "Ignite DPS:",
-						base = s_format("%.1f ^8(total damage per second)", baseVal), 
+						base = s_format("%.1f ^8(total damage per second)", baseVal),
 						{ "%.2f ^8(ailment effect modifier)", effectMod },
 						{ "%.2f ^8(burn rate modifier)", burnRateMod },
 						{ "%.3f ^8(effective DPS modifier)", effMult },
