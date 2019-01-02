@@ -864,7 +864,7 @@ With at least 40 Strength in Radius, Heavy Strike has a 20% chance to deal Doubl
 ]],[[
 Wildfire
 Crimson Jewel
-Limited to: 2
+Limited to: 1
 Radius: Medium
 (10–15)% increased Fire Damage 
 With at least 40 Strength in Radius, Molten Strike fires 2 additional Projectiles
@@ -983,7 +983,7 @@ Self-Flagellation
 Viridian Jewel
 Limited to: 1
 Implicits: 0
-You can have one additional Curse
+An additional Curse can be applied to you
 (10-20)% increased Damage per Curse on you
 Corrupted
 ]],[[

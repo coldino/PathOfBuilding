@@ -41,6 +41,7 @@ local function infoDump(env)
 	ConPrintf("Mod: %s", modLib.formatFlags(mainSkill.skillCfg.flags, ModFlag))
 	ConPrintf("Keyword: %s", modLib.formatFlags(mainSkill.skillCfg.keywordFlags, KeywordFlag))
 	ConPrintf("=== Main Skill Mods ===")
+	mainSkill.skillModList.parent:Print()
 	mainSkill.skillModList:Print()
 	ConPrintf("== Aux Skills ==")
 	for i, aux in ipairs(env.auxSkillList) do
@@ -61,12 +62,10 @@ local function getCalculator(build, fullInit, modFunc)
 	-- Save a copy of the initial mod database
 	local initModDB = new("ModDB")
 	initModDB:AddDB(env.modDB)
-	initModDB.actor = env.player
 	initModDB.conditions = copyTable(env.modDB.conditions)
 	initModDB.multipliers = copyTable(env.modDB.multipliers)
 	local initEnemyDB = new("ModDB")
 	initEnemyDB:AddDB(env.enemyDB)
-	initEnemyDB.actor = env.enemy
 	initEnemyDB.conditions = copyTable(env.enemyDB.conditions)
 	initEnemyDB.multipliers = copyTable(env.enemyDB.multipliers)
 
@@ -185,31 +184,46 @@ function calcs.buildOutput(build, mode)
 				addMult(out, tag.var, mod)
 			end
 		end
+		local function addModTags(mod)
+			for _, tag in ipairs(mod) do
+				if tag.type == "IgnoreCond" then
+					break
+				elseif tag.type == "Condition" then
+					if actor == env.player then
+						addCondTag(env.conditionsUsed, tag, mod)
+					else
+						addCondTag(env.minionConditionsUsed, tag, mod)
+					end
+				elseif tag.type == "ActorCondition" and tag.actor == "enemy" then
+					addCondTag(env.enemyConditionsUsed, tag, mod)
+				elseif tag.type == "Multiplier" or tag.type == "MultiplierThreshold" then
+					if not tag.actor then
+						if actor == env.player then
+							addMultTag(env.multipliersUsed, tag, mod)
+						end
+					elseif tag.actor == "enemy" then
+						addMultTag(env.enemyMultipliersUsed, tag, mod)
+					end
+				end
+			end
+		end
 		for _, actor in ipairs({env.player, env.minion}) do
 			for modName, modList in pairs(actor.modDB.mods) do
 				for _, mod in ipairs(modList) do
-					for _, tag in ipairs(mod) do
-						if tag.type == "IgnoreCond" then
-							break
-						elseif tag.type == "Condition" then
-							if actor == env.player then
-								addCondTag(env.conditionsUsed, tag, mod)
-							else
-								addCondTag(env.minionConditionsUsed, tag, mod)
-							end
-						elseif tag.type == "ActorCondition" and tag.actor == "enemy" then
-							addCondTag(env.enemyConditionsUsed, tag, mod)
-						elseif tag.type == "Multiplier" or tag.type == "MultiplierThreshold" then
-							if not tag.actor then
-								if actor == env.player then
-									addMultTag(env.multipliersUsed, tag, mod)
-								end
-							elseif tag.actor == "enemy" then
-								addMultTag(env.enemyMultipliersUsed, tag, mod)
-							end
-						end
-					end
+					addModTags(mod)
 				end		
+			end
+		end
+		for _, activeSkill in pairs(env.activeSkillList) do
+			for _, mod in ipairs(activeSkill.skillModList) do
+				addModTags(mod)
+			end
+			if activeSkill.minion then
+				for _, activeSkill in pairs(activeSkill.minion.activeSkillList) do
+					for _, mod in ipairs(activeSkill.skillModList) do
+						addModTags(mod)
+					end
+				end
 			end
 		end
 		for modName, modList in pairs(env.enemyDB.mods) do
@@ -271,7 +285,7 @@ function calcs.buildOutput(build, mode)
 		env.player.breakdown.SkillBuffs = { modList = { } }
 		for _, name in ipairs(buffList) do
 			for _, mod in ipairs(env.buffs[name]) do
-				local value = env.modDB:EvalMod(env.modDB, mod)
+				local value = env.modDB:EvalMod(mod)
 				if value and value ~= 0 then
 					t_insert(env.player.breakdown.SkillBuffs.modList, {
 						mod = mod,
@@ -287,7 +301,7 @@ function calcs.buildOutput(build, mode)
 		table.sort(curseList)
 		for index, name in ipairs(curseList) do
 			for _, mod in ipairs(env.debuffs[name]) do
-				local value = env.enemy.modDB:EvalMod(env.enemy.modDB, mod)
+				local value = env.enemy.modDB:EvalMod(mod)
 				if value and value ~= 0 then
 					t_insert(env.player.breakdown.SkillDebuffs.modList, {
 						mod = mod,
@@ -304,7 +318,7 @@ function calcs.buildOutput(build, mode)
 			t_insert(curseList, slot.name)
 			if slot.modList then
 				for _, mod in ipairs(slot.modList) do
-					local value = env.enemy.modDB:EvalMod(env.enemy.modDB, mod)
+					local value = env.enemy.modDB:EvalMod(mod)
 					if value and value ~= 0 then
 						t_insert(env.player.breakdown.SkillDebuffs.modList, {
 							mod = mod,
@@ -348,7 +362,7 @@ function calcs.buildOutput(build, mode)
 			env.minion.breakdown.SkillBuffs = { modList = { } }
 			for _, name in ipairs(buffList) do
 				for _, mod in ipairs(env.minionBuffs[name]) do
-					local value = env.minion.modDB:EvalMod(env.minion.modDB, mod)
+					local value = env.minion.modDB:EvalMod(mod)
 					if value and value ~= 0 then
 						t_insert(env.minion.breakdown.SkillBuffs.modList, {
 							mod = mod,

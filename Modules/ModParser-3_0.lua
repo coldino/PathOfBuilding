@@ -127,6 +127,9 @@ local modNameList = {
 	["all resistances"] = { "ElementalResist", "ChaosResist" },
 	["all maximum elemental resistances"] = { "FireResistMax", "ColdResistMax", "LightningResistMax" },
 	["all maximum resistances"] = { "FireResistMax", "ColdResistMax", "LightningResistMax", "ChaosResistMax" },
+	["fire and chaos resistances"] = { "FireResist", "ChaosResist" },
+	["cold and chaos resistances"] = { "ColdResist", "ChaosResist" },
+	["lightning and chaos resistances"] = { "LightningResist", "ChaosResist" },
 	-- Damage taken
 	["damage taken"] = "DamageTaken",
 	["damage taken when hit"] = "DamageTakenWhenHit",
@@ -753,6 +756,7 @@ local modTagList = {
 	["while you have avian's flight"] = { tag = { type = "Condition", var = "AffectedByAvian'sFlight" } },
 	["while affected by aspect of the cat"] = { tag = { type = "Condition", varList = { "AffectedByCat'sStealth", "AffectedByCat'sAgility" } } },
 	["while you have a bestial minion"] = { tag = { type = "Condition", var = "HaveBestialMinion" } },
+	["while focused"] = { tag = { type = "Condition", var = "Focused" } },
 	["while leeching"] = { tag = { type = "Condition", var = "Leeching" } },
 	["while using a flask"] = { tag = { type = "Condition", var = "UsingFlask" } },
 	["during effect"] = { tag = { type = "Condition", var = "UsingFlask" } },
@@ -959,7 +963,6 @@ local specialModList = {
 	["cannot be stunned while you have fortify"] = { mod("AvoidStun", "BASE", 100, { type = "Condition", var = "Fortify" }) },
 	["enemies taunted by you take (%d+)%% increased damage"] = function(num) return { mod("EnemyModifier", "LIST", { mod = mod("DamageTaken", "INC", num, { type = "Condition", var = "Taunted" }) }) } end,
 	["enemies taunted by you cannot evade attacks"] = { mod("EnemyModifier", "LIST", { mod = flag("CannotEvade", { type = "Condition", var = "Taunted" }) }) },
-	["gain adrenaline for %d+ seconds when you reach low life if you do not have adrenaline"] = { flag("Condition:CanGainAdrenaline") },
 	-- Chieftan
 	["enemies near your totems take (%d+)%% increased physical and fire damage"] = function(num) return {
 		mod("EnemyModifier", "LIST", { mod = mod("PhysicalDamageTaken", "INC", num) }), 
@@ -970,8 +973,7 @@ local specialModList = {
 	["gain %+(%d+) life when you hit a bleeding enemy"] = function(num) return { mod("LifeOnHit", "BASE", num, { type = "ActorCondition", actor = "enemy", var = "Bleeding" }) } end,
 	["accuracy rating is doubled"] = { mod("Accuracy", "MORE", 100) },
 	["(%d+)%% increased blink arrow and mirror arrow cooldown recovery speed"] = function(num) return {
-		mod("CooldownRecovery", "INC", num, { type = "SkillName", skillName = "Blink Arrow" }),
-		mod("CooldownRecovery", "INC", num, { type = "SkillName", skillName = "Mirror Arrow" }),
+		mod("CooldownRecovery", "INC", num, { type = "SkillName", skillNameList = { "Blink Arrow", "Mirror Arrow" } }),
 	} end,
 	["if you've used a skill recently, you and nearby allies have tailwind"] = { mod("ExtraAura", "LIST", { mod = flag("Condition:Tailwind") }, { type = "Condition", var = "UsedSkillRecently" }) },
 	["projectiles deal (%d+)%% more damage for each remaining chain"] = function(num) return { mod("Damage", "MORE", num, nil, ModFlag.Projectile, { type = "PerStat", stat = "ChainRemaining" }) } end,
@@ -1297,6 +1299,9 @@ local specialModList = {
 	["arrows that pierce have (%d+)%% chance to cause bleeding"] = function(num) return { mod("BleedChance", "BASE", num, nil, bor(ModFlag.Attack, ModFlag.Projectile), { type = "StatThreshold", stat = "PierceCount", threshold = 1 }) } end,
 	["arrows that pierce deal (%d+)%% increased damage"] = function(num) return { mod("Damage", "INC", num, nil, bor(ModFlag.Attack, ModFlag.Projectile), { type = "StatThreshold", stat = "PierceCount", threshold = 1 }) } end,
 	["projectiles gain (%d+)%% of non%-chaos damage as extra chaos damage per chain"] = function(num) return { mod("NonChaosDamageGainAsChaos", "BASE", num, nil, ModFlag.Projectile, { type = "PerStat", stat = "Chain" }) } end,
+	["left ring slot: projectiles from spells cannot chain"] = { flag("CannotChain", nil, bor(ModFlag.Spell, ModFlag.Projectile), { type = "SlotNumber", num = 1 }) },
+	["right ring slot: projectiles from spells chain %+1 times"] = { mod("ChainCount", "BASE", 1, nil, bor(ModFlag.Spell, ModFlag.Projectile), { type = "SlotNumber", num = 2 }) },
+	["projectiles from spells cannot pierce"] = { flag("CannotPierce", nil, ModFlag.Spell) },
 	-- Leech/Gain on Hit
 	["cannot leech life"] = { flag("CannotLeechLife") },
 	["cannot leech mana"] = { flag("CannotLeechMana") },
