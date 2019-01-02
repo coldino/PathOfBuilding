@@ -1668,6 +1668,7 @@ skills["PuresteelBanner"] = {
 		skill("castTime", 0),
 		skill("manaCost", 10),
 		skill("cooldown", 1),
+		skill("radius", 40),
 		skill("manaCost", 0, { type = "Condition", var = "BannerPlanted" }),
 	},
 	levelMods = {
@@ -6916,6 +6917,7 @@ skills["BloodstainedBanner"] = {
 		skill("castTime", 0),
 		skill("manaCost", 10),
 		skill("cooldown", 1),
+		skill("radius", 40),
 		skill("manaCost", 0, { type = "Condition", var = "BannerPlanted" }),
 	},
 	levelMods = {

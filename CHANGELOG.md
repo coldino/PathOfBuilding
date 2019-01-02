@@ -1,3 +1,20 @@
+### 1.4.123 - 2019/01/02
+ * Fixed issue causing Configuration tab options to sometimes fail to appear when appropriate
+ * Fixed error when adding crafted modifiers to items
+
+### 1.4.122 - 2019/01/01
+ * Updated the crafting bench options for 3.5
+ * Added support for most of the new craft modifiers
+ * Applied the weapon restriction changes from 3.5
+ * Adrenaline can now always be enabled (as it is no longer exclusive to Champion)
+ * Fixed issue with modifiers to socketed gem level applying twice
+
+### 1.4.121 - 2018/12/12
+ * Applied the unique balance changes for 3.5
+ * Added base radius values for Vortex (20), Armageddon Brand (18/8), Winter Orb (16), and the Banner skills (40)
+ * Fixed issue with certain conditional skill stats not working correctly
+    * This notably caused Elemental Hit to deal all elements at once
+
 ### 1.4.120 - 2018/12/11
  * Added skill parts to Shattering Steel to show both projectile and cone damage
  * Fixed Claw Crit Chance conversion from Rigwald's Curse
