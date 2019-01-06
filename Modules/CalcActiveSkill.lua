@@ -52,7 +52,6 @@ end
 function calcs.mergeSkillInstanceMods(env, modList, skillEffect)
 	calcLib.validateGemLevel(skillEffect)
 	local grantedEffect = skillEffect.grantedEffect
-	skillEffect.grantedEffectLevel = grantedEffect.levels[skillEffect.level]
 	modList:AddList(grantedEffect.baseMods)
 	local stats = calcLib.buildSkillInstanceStats(skillEffect, grantedEffect)
 	for stat, statValue in pairs(stats) do
@@ -154,6 +153,8 @@ function calcs.buildActiveSkillModList(env, actor, activeSkill)
 	local skillFlags = activeSkill.skillFlags
 	local activeEffect = activeSkill.activeEffect
 	local activeGrantedEffect = activeEffect.grantedEffect
+	calcLib.validateGemLevel(activeEffect)
+	activeEffect.grantedEffectLevel = activeGrantedEffect.levels[activeEffect.level]
 
 	-- Set mode flags
 	if env.mode_buffs then
@@ -371,12 +372,12 @@ function calcs.buildActiveSkillModList(env, actor, activeSkill)
 	for _, skillEffect in pairs(activeSkill.effectList) do
 		if skillEffect.grantedEffect.support then
 			calcs.mergeSkillInstanceMods(env, skillModList, skillEffect)
-			local level = skillEffect.grantedEffectLevel
-			if level.manaMult then
-				skillModList:NewMod("ManaCost", "MORE", level.manaMult, skillEffect.grantedEffect.modSource)
+			local level = skillEffect.grantedEffect.levels[skillEffect.level]
+			if level.manaMultiplier then
+				skillModList:NewMod("ManaCost", "MORE", level.manaMultiplier, skillEffect.grantedEffect.modSource)
 			end
 			if level.manaCostOverride then
-				activeSkill.skillData.manaCostOVerride = level.manaCostOverride
+				activeSkill.skillData.manaCostOverride = level.manaCostOverride
 			end
 			if level.cooldown then
 				activeSkill.skillData.cooldown = level.cooldown
